@@ -105,7 +105,45 @@ def reinforce(faction_name, game):
 		game.regions[info[0]].troops += 1
 		reinforcements -= 1
 
+def attack_eligibility(faction_name, reg, regions):
+	# does this region have more than 3 troops
+	if reg.troops <= 3:
+		return False
+
+	# does this region border an enemy region
+	border = False
+	for neighbor_name in reg.neighbors:
+		if lookup_region_by_name(neighbor_name, regions).owner != faction_name:
+			border = True
+	if not border:
+		return False
+
+	# does the enemy region have less troops? - then attack
+	# does the enemy region have more than 1.5x as many troops? - then attack
+	for neighbor_name in reg.neighbors:
+		enemy_reg = lookup_region_by_name(neighbor_name, regions)
+		if enemy_reg.owner != faction_name:
+			if enemy_reg.troops < reg.troops || enemy_reg.troops > 1.5 * reg.troops:
+				return True
+
+def dice_roll(attack_faction, attack_region, defend_region, game):
+	print(attack_faction + " is attacking " + defend_region.name + " with " + str(attack_region.troops) + " troops from " + attack_region.name + ".")
+	print(defend_region.name + " is owned by " + defend_region.owner + " and has " + str(defend_region.troops) + " defending it.")
+	# ok left off here
+
+
+
 def attack(faction_name, game):
+	# iterate through regions and decide for each one if it is eligible to attack
+	attack_list = []
+	for reg in game.regions:
+		if reg.owner == faction_name:
+			if attack_eligibility(faction_name, reg, game.regions):
+				attack_list.append(reg)
+
+	# ok i left off here
+
+
 	# choose weak region to attack (or not to attack at all?)
 	# attack the region
 	# choose how many troops to move
